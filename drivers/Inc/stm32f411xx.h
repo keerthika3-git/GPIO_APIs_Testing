@@ -11,6 +11,31 @@
 #include<stdint.h>
 
 #define __vo volatile
+
+
+
+/*********** PROCESSOR SPECIFIC DETAILS ****************/
+//ARM CORTEX Mx Processor NVIC Interrupt Set Enable Register x register Addresses
+
+#define NVIC_ISER0          ((__vo uint32_t*)0xE000E100)
+#define NVIC_ISER1          ((__vo uint32_t*)0xE000E104)
+#define NVIC_ISER2          ((__vo uint32_t*)0xE000E108)
+#define NVIC_ISER3          ((__vo uint32_t*)0xE000E10C)
+
+//ARM CORTEX Mx Processor NVIC Interrupt Clear Enable Register x register Addresses
+
+#define NVIC_ICER0          ((__vo uint32_t*)0xE000E180)
+#define NVIC_ICER1          ((__vo uint32_t*)0xE000E184)
+#define NVIC_ICER2          ((__vo uint32_t*)0xE000E188)
+#define NVIC_ICER3          ((__vo uint32_t*)0xE000E18C)
+
+
+/* ARM Cortex Mx Processor Priority Register Address Calculation */
+#define NVIC_PR_BASE_ADDR ((__vo uint32_t*)0xE000E400)
+
+
+#define NO_PR_BITS_IMPLEMENTED     4     //
+
 //DEFINE BASE ADDRESSES OF MEMORY IN MCU
 #define FLASH_BASEADDR       0x08000000U //base adress of flash memory or main memory
 #define SRAM1_BASEADDR       0x20000000U //base address of SRAM1 if available mention SRAM2
@@ -103,7 +128,68 @@ typedef struct{
 
 }RCC_RegDef_t; // rcc controls clocks and here you can use this as registers
 
-/* PERIPHERAL DEFINITIONS (perpheral base addresses typecasted to xxxx_RegDef_t ) */
+
+/* PERIPHERAL  REGISTER  DEFINITION STRUCTURES FOR EXTI */
+typedef struct{
+	__vo uint32_t IMR;
+	__vo uint32_t EMR;
+	__vo uint32_t RTSR;
+	__vo uint32_t FTSR;
+	__vo uint32_t SWIER;
+	__vo uint32_t PR;
+}EXTI_RegDef_t;
+
+/* PERIPHERAL  REGISTER  DEFINITION STRUCTURES FOR SYSCFG */
+typedef struct{
+	__vo uint32_t MEMRMP;
+	__vo uint32_t PMC;
+	__vo uint32_t EXTICR[4];
+	__vo uint32_t CMPCR;
+}SYSCFG_RegDef_t;
+
+/*port selection for GPIOx*/
+#define GPIO_BASEADDR_TO_CODE(x)    ((x==GPIOA)? 0:\
+		                            (x==GPIOB)? 1:\
+		                            (x==GPIOC)? 2:\
+		                            (x==GPIOD)? 3:\
+		                            (x==GPIOE)? 4:\
+		                            (x==GPIOH)? 7:0)
+
+/*INTERRUPT REQUEST NUMBER*/
+#define IRQ_NO_EXTI0      6
+#define IRQ_NO_EXTI1      7
+#define IRQ_NO_EXTI2      8
+#define IRQ_NO_EXTI3      9
+#define IRQ_NO_EXTI4      10
+#define IRQ_NO_EXTI9_5    23
+#define IRQ_NO_EXTI15_10  40
+#define IRQ_NO_EXTI16     1
+#define IRQ_NO_EXTI17     41
+#define IRQ_NO_EXTI18     42
+#define IRQ_NO_EXTI21     2
+#define IRQ_NO_EXTI22     3
+
+/* MACROS for all possible priority levels */
+#define NVIC_IRQ_PRI0     0
+#define NVIC_IRQ_PRI1     1
+#define NVIC_IRQ_PRI2     2
+#define NVIC_IRQ_PRI3     3
+#define NVIC_IRQ_PRI4     4
+#define NVIC_IRQ_PRI5     5
+#define NVIC_IRQ_PRI6     6
+#define NVIC_IRQ_PRI7     7
+#define NVIC_IRQ_PRI8     8
+#define NVIC_IRQ_PRI9     9
+#define NVIC_IRQ_PRI10    10
+#define NVIC_IRQ_PRI11    11
+#define NVIC_IRQ_PRI12    12
+#define NVIC_IRQ_PRI13    13
+#define NVIC_IRQ_PRI14    14
+#define NVIC_IRQ_PRI15    15
+
+
+
+/* PERIPHERAL DEFINITIONS (peripheral base addresses type casted to xxxx_RegDef_t ) */
 
 #define GPIOA  ((GPIO_RegDef_t*)GPIOA_BASEADDR)
 #define GPIOB  ((GPIO_RegDef_t*)GPIOB_BASEADDR)
@@ -114,6 +200,9 @@ typedef struct{
 
 #define RCC    ((RCC_RegDef_t*)RCC_BASEADDR) //need this to enable and disable clock
 
+#define EXTI   ((EXTI_RegDef_t*)EXTI_BASEADDR) // deliver interrupts from peripheral side
+
+#define SYSCFG  ((SYSCFG_RegDef_t*)SYSCFG_BASEADDR)// interrupt pin port is decided by SYSCFG
 
 /* CLOCK ENABLE MACROS FOR GPIOX PERIPHERALS */
 #define GPIOA_PCLK_EN()  (RCC -> AHB1ENR |= (1<<0)) // |= means setting bit (enable)
