@@ -19,7 +19,7 @@
 #define BTN_PRESSED HIGH
 
 void delay(void){
-	for(uint8_t i=0;i<1000;i++);
+	for(uint32_t i=0;i<500000/2;i++);
 }
 
 int main(void){
@@ -49,7 +49,7 @@ int main(void){
 
 		while(1){
 			if(GPIO_ReadFromInputPin(GPIOB,GPIO_PIN_NO_5) == BTN_PRESSED){
-//			delay(); //added to prevent de-bouncing issues
+			delay(); //added to prevent de-bouncing issues
  			GPIO_ToggleOutputPin(GPIOA,GPIO_PIN_NO_8);
 			}
 

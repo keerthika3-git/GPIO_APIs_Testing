@@ -72,6 +72,9 @@
 
 //DEFINE BASE ADDRESSES OF PERIPHERAL CONNECTED TO APB2 BUS
 #define SPI1_BASEADDR    (APB2PERIPHERAL_BASEADDR+0x3000)
+#define SPI4_BASEADDR    (APB2PERIPHERAL_BASEADDR+0x3400)
+#define SPI5_BASEADDR    (APB2PERIPHERAL_BASEADDR+0x5000)
+
 
 #define USART1_BASEADDR  (APB2PERIPHERAL_BASEADDR+0x1000)
 #define USART6_BASEADDR  (APB2PERIPHERAL_BASEADDR+0x1400)
@@ -94,6 +97,20 @@ typedef struct{
 	__vo uint32_t AFRL[2];   //..every register in GPIO defined in structure for effecient access
 	                   // refer REFERNCE MANUAL for name of GPIO registers.
 }GPIO_RegDef_t;
+
+/* PERIPHERAL  REGISTER  DEFINITION STRUCTURES FOR SPI */
+typedef struct {
+	__vo uint32_t CR1;
+	__vo uint32_t CR2;
+	__vo uint32_t SR;
+	__vo uint32_t DR;
+	__vo uint32_t CRCPR;
+	__vo uint32_t RXCRCR;
+	__vo uint32_t TXCRCR;
+	__vo uint32_t I2SCFGR;
+	__vo uint32_t I2SPR;
+
+}SPI_RegDef_t;
 
 typedef struct{
 	__vo uint32_t CR;
@@ -204,6 +221,13 @@ typedef struct{
 
 #define SYSCFG  ((SYSCFG_RegDef_t*)SYSCFG_BASEADDR)// interrupt pin port is decided by SYSCFG
 
+#define SPI1     ((SPI_RegDef_t*)SPI1_BASEADDR)
+#define SPI2     ((SPI_RegDef_t*)SPI2_BASEADDR)
+#define SPI3     ((SPI_RegDef_t*)SPI3_BASEADDR)
+#define SPI4     ((SPI_RegDef_t*)SPI4_BASEADDR)
+#define SPI5     ((SPI_RegDef_t*)SPI5_BASEADDR)
+
+
 /* CLOCK ENABLE MACROS FOR GPIOX PERIPHERALS */
 #define GPIOA_PCLK_EN()  (RCC -> AHB1ENR |= (1<<0)) // |= means setting bit (enable)
 #define GPIOB_PCLK_EN()  (RCC -> AHB1ENR |= (1<<1))
@@ -221,6 +245,8 @@ typedef struct{
 #define SPI2_PCLK_EN()    (RCC -> APB1ENR |= (1<<14))
 #define SPI3_PCLK_EN()    (RCC -> APB1ENR |= (1<<15))
 #define SPI1_PCLK_EN()    (RCC -> APB2ENR |= (1<<12))
+#define SPI4_PCLK_EN()    (RCC -> APB2ENR |= (1<<13))
+#define SPI5_PCLK_EN()    (RCC -> APB2ENR |= (1<<20))
 
 /* CLOCK ENABLE MACROS FOR USARTX PERIPHERALS */
 #define USART2_PCLK_EN()    (RCC -> APB1ENR |= (1<<17))
@@ -250,6 +276,10 @@ typedef struct{
 #define SPI2_PCLK_DI()    (RCC -> APB1ENR &= ~(1<<14))
 #define SPI3_PCLK_DI()    (RCC -> APB1ENR &= ~(1<<15))
 #define SPI1_PCLK_DI()    (RCC -> APB2ENR &= ~(1<<12))
+#define SPI4_PCLK_DI()    (RCC -> APB2ENR &= ~(1<<13))
+#define SPI5_PCLK_DI()    (RCC -> APB2ENR &= ~(1<<20))
+
+
 
 /* CLOCK DISABLE MACROS FOR USARTX PERIPHERALS */
 #define USART2_PCLK_DI()    (RCC -> APB1ENR &= ~(1<<17))
@@ -268,6 +298,13 @@ typedef struct{
 #define GPIOE_REG_RESET()    do{(RCC -> AHB1ENR |= (1<<4)); (RCC -> AHB1ENR &= ~(1<<4));}while(0)
 #define GPIOH_REG_RESET()    do{(RCC -> AHB1ENR |= (1<<7)); (RCC -> AHB1ENR &= ~(1<<7));}while(0)
 
+/* Macros to reset SPIX peripherals  */
+#define SPI1_REG_RESET()    do{(RCC -> APB2ENR |= (1<<12)); (RCC -> APB2ENR &= ~(1<<12));}while(0)
+#define SPI2_REG_RESET()    do{(RCC -> APB1ENR |= (1<<14)); (RCC -> APB1ENR &= ~(1<<14));}while(0)
+#define SPI3_REG_RESET()    do{(RCC -> APB1ENR |= (1<<15)); (RCC -> APB1ENR &= ~(1<<15));}while(0)
+#define SPI4_REG_RESET()    do{(RCC -> APB2ENR |= (1<<13)); (RCC -> APB2ENR &= ~(1<<13));}while(0)
+#define SPI5_REG_RESET()    do{(RCC -> APB2ENR |= (1<<20)); (RCC -> APB2ENR &= ~(1<<20));}while(0)
+
 //some generic macros
 
 #define ENABLE               1
@@ -276,7 +313,52 @@ typedef struct{
 #define RESET              DISABLE
 #define GPIO_PINSET         SET
 #define GPIO_PINRESET       RESET
+#define FLAG_RESET          RESET
+#define FLAG_SET            SET
+
+/* BIT POSITION DEFINITIONS OF SPI PERPHERAL  */
+
+/********   SPI_CR1 REGISTER BITS     ***********/
+#define SPI_CR1_CPHA          0
+#define SPI_CR1_CPOL          1
+#define SPI_CR1_MSTR          2
+#define SPI_CR1_BR            3
+#define SPI_CR1_SPE           6
+#define SPI_CR1_LSBFIRST      7
+#define SPI_CR1_SSI           8
+#define SPI_CR1_SSM           9
+#define SPI_CR1_RXONLY        10
+#define SPI_CR1_DFF           11
+#define SPI_CR1_CRCNEXT       12
+#define SPI_CR1_CRCEN         13
+#define SPI_CR1_BIDIOE        14
+#define SPI_CR1_BIDIMODE      15
+
+/********    SPI_CR2 REGISTER BITS   ***********/
+#define SPI_CR2_RXDMAEN       0
+#define SPI_CR2_TXDMAEN       1
+#define SPI_CR2_SSOE          2
+#define SPI_CR2_FRF           4
+#define SPI_CR2_ERRIE         5
+#define SPI_CR2_RXNEIE        6
+#define SPI_CR2_TXEIE         7
+
+/********   SPI_SR REGISTER BITS   ***********/
+#define SPI_SR_RXNE           0
+#define SPI_SR_TXE            1
+#define SPI_SR_CHSIDE         2
+#define SPI_SR_UDR            3
+#define SPI_SR_CRCERR         4
+#define SPI_SR_MODF           5
+#define SPI_SR_OVR            6
+#define SPI_SR_BSY            7
+#define SPI_SR_FRE            8
+
+
+
+
 
 #include"stm32f411xx_gpio_driver.h"
+#include "stm32f411xx_spi_driver.h"
 
 #endif /* INC_STM32F411XX_H_ */

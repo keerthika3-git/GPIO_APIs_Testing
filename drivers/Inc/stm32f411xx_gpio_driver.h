@@ -116,7 +116,7 @@ void GPIO_WriteToOutputPort(GPIO_RegDef_t *pGPIOx, uint16_t Value);//first param
 void GPIO_ToggleOutputPin(GPIO_RegDef_t *pGPIOx,uint8_t PinNumber);//first parameter point to base address of GPIOx register
                                                                    //second parameter variable to hold pin number
 
-/* TRQ Configuration and ISR Handling */
+/* IRQ Configuration and ISR Handling */
 
 void GPIO_IRQInterruptConfig(uint8_t IRQNumber,uint8_t EnorDis);//In IRQconfig need IRQ number,priority,enable or disable
 

@@ -1,5 +1,6 @@
-"./Src/004.button_interrupt.o"
+"./Src/005.Spi_tx_testing.o"
 "./Src/syscalls.o"
 "./Src/sysmem.o"
 "./Startup/startup_stm32f411retx.o"
 "./drivers/Src/stm32f411xx_gpio_driver.o"
+"./drivers/Src/stm32f411xx_spi_driver.o"
