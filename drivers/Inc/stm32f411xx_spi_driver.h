@@ -45,7 +45,8 @@ typedef struct{
  */
 #define SPI_BUS_CONFIG_FD                  1
 #define SPI_BUS_CONFIG_HD                  2
-#define SPI_BUS_CONFIG_SIMPLEX_RXONLY      3
+#define SPI_BUS_CONFIG_SIMPLEX_TXONLY      3
+#define SPI_BUS_CONFIG_SIMPLEX_RXONLY      4
 
 /*
  @SPI_SClkSpeed
@@ -130,5 +131,10 @@ void SPI_IRQPriority(uint8_t IRQNumber,uint32_t IRQPriority);//priority
 
 void SPI_IRQHandling(SPI_Handle_t *pHandle);
 
+/*
+ * Peripheral Control APIs
+ */
+void SPI_Peripheralcontrol(SPI_RegDef_t *pSPIx, uint8_t EnorDi); //to enable SPI Peripheral
+void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnorDi);
 
 #endif /* INC_STM32F411XX_SPI_DRIVER_H_ */

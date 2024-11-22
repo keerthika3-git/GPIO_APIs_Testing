@@ -53,6 +53,8 @@ void SPI_PeriClockControl(SPI_RegDef_t *pSPIx,uint8_t EnorDi){
 
 void SPI_Init(SPI_Handle_t *pSPIHandle){
 
+      //Enable peripheral clock
+	  SPI_PeriClockControl(pSPIHandle->pSPIx,ENABLE);
 
 	  uint32_t tempreg = 0;
 	  //1. Configure Device Mode
@@ -66,6 +68,10 @@ void SPI_Init(SPI_Handle_t *pSPIHandle){
 	  else if(pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_HD){
 		  //set bidi mode
 		  tempreg |= (1<<15);
+	  }
+	  else if(pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_SIMPLEX_TXONLY){
+		  //set bidi mode
+		  tempreg |= (1<<14);
 	  }
 	  else if(pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_SIMPLEX_RXONLY){
 		  //clear bidi mode
@@ -85,6 +91,9 @@ void SPI_Init(SPI_Handle_t *pSPIHandle){
 
 	  //6.Configure CPHA
 	  tempreg |= pSPIHandle->SPIConfig.SPI_CPHA << SPI_CR1_CPHA;
+
+	  //7.configure SSM
+	  tempreg |= pSPIHandle->SPIConfig.SPI_SSM << SPI_CR1_SSM;
 
 	  pSPIHandle->pSPIx->CR1 = tempreg;
 }
@@ -151,3 +160,26 @@ void SPI_IRQInterruptConfig(uint8_t IRQNumber,uint8_t EnorDis);//In IRQconfig ne
 void SPI_IRQPriority(uint8_t IRQNumber,uint32_t IRQPriority);//priority
 
 void SPI_IRQHandling(SPI_Handle_t *pHandle);
+
+
+
+void SPI_Peripheralcontrol(SPI_RegDef_t *pSPIx, uint8_t EnorDi){
+	if(EnorDi == ENABLE){
+	pSPIx->CR1 |= (1<<SPI_CR1_SPE);
+	}
+	else{
+	pSPIx->CR1 &= ~(1<<SPI_CR1_SPE);
+
+	}
+}
+
+void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnorDi){
+	if(EnorDi == ENABLE){
+		pSPIx->CR1 |= (1<<SPI_CR1_SSI);
+		}
+		else{
+		pSPIx->CR1 &= ~(1<<SPI_CR1_SSI);
+
+		}
+}
+
