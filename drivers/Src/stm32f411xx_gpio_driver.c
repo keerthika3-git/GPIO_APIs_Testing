@@ -65,8 +65,9 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle){
 
 	uint32_t temp=0;
 
-	//Enable Peripheral clock
-	GPIO_PeriClockControl(pGPIOHandle->pGPIOx, ENABLE);
+//	//Enable Peripheral clock
+//	GPIO_PeriClockControl(pGPIOHandle->pGPIOx, ENABLE);
+
 
 	//1.configure modes
 	 if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <= GPIO_MODE_ANALOG ){
@@ -106,9 +107,11 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle){
 		 //3.enable EXTI interrupt delivery using IMR
 		 EXTI->IMR =(1<<pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
 	 }
+
 	 temp=0;
 
 	 //2.configure speed
+
 	 temp=(pGPIOHandle->GPIO_PinConfig.GPIO_PinSpeed <<(2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
 	 pGPIOHandle->pGPIOx->OSPEEDR &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);//clearing 2bits before setting and 0x3 means to enable first 2bits - 0011(3)
 	 pGPIOHandle->pGPIOx->OSPEEDR |=temp; //setting
@@ -116,6 +119,7 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle){
 	 temp=0;
 
 	 //3.configure output types
+
 	 temp=(pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType <<(pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
 	 pGPIOHandle->pGPIOx->OTYPER &= ~(0x1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);//clearing 1bit before setting
 	 pGPIOHandle->pGPIOx->OTYPER |=temp; //setting
@@ -123,6 +127,7 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle){
 	 temp=0;
 
 	 //4. configure pull up/pull down
+
 	 temp=(pGPIOHandle->GPIO_PinConfig.GPIO_PinPuPdControl <<(2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
 	 pGPIOHandle->pGPIOx->PUPDR &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);//clearing 2bits before setting and 0x3 means to enable first 2bits - 0011(3)
      pGPIOHandle->pGPIOx->PUPDR |=temp;
@@ -130,7 +135,8 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle){
 	 temp=0;
 
 	 //5.configure alternate functionality
-	 if(pGPIOHandle->GPIO_PinConfig.GPIO_PinAltFunMode == GPIO_MODE_ALTFN ){
+	 if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode == GPIO_MODE_ALTFN ){
+
 		uint8_t temp1,temp2;
 		temp1 = pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber / 8;
 		temp2 = pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber % 8;

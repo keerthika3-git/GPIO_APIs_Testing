@@ -10,12 +10,14 @@
  * PB13 -> SPI2_SCLK
  * PB12 -> SPI_NSS
  * ALT function mode : A5
+ * PA5 -> SPI1 SCLK PIN D13
+ * PA7 -> SPI1 MOSI PIN D11
  */
 #include "stm32f411xx.h"
 #include<stdio.h>
 #include<string.h>
 
-void SPI2_PinsInit(void){
+void SPI2_PinsInit(){
 	GPIO_Handle_t SPIPins;
 
 	SPIPins.pGPIOx = GPIOB;
@@ -24,6 +26,14 @@ void SPI2_PinsInit(void){
 	SPIPins.GPIO_PinConfig.GPIO_PinOPType=GPIO_OP_TYPE_PP;
 	SPIPins.GPIO_PinConfig.GPIO_PinSpeed=GPIO_SPEED_FAST;
 	SPIPins.GPIO_PinConfig.GPIO_PinPuPdControl=GPIO_NO_PUPD;
+
+	GPIO_PeriClockControl(SPIPins.pGPIOx, ENABLE);
+	SPIPins.pGPIOx->MODER = 0x00000000;
+	SPIPins.pGPIOx->OSPEEDR= 0x00000000;
+	SPIPins.pGPIOx->OTYPER=0x00000000;
+	SPIPins.pGPIOx->PUPDR=0x00000000;
+	SPIPins.pGPIOx->AFRL[0]=0x00000000;
+	SPIPins.pGPIOx->AFRL[1]=0x00000000;
 
 	//SCLK
 	SPIPins.GPIO_PinConfig.GPIO_PinNumber=GPIO_PIN_NO_13;
@@ -61,7 +71,7 @@ void SPI2_Init(void){
 }
 
 int main(void){
-	char user_data[] ="Hello";
+	char user_data[] ="Hello World";
 
 	SPI2_PinsInit();   // to initialize GPIO pins to behave as SPI2 pins
 
@@ -70,11 +80,14 @@ int main(void){
 
     SPI_SSIConfig(SPI2,ENABLE); // to make NSS signal internally high avoid MODF error
 
+
     SPI_Peripheralcontrol(SPI2,ENABLE); // To enable SPI2 peripheral
 
 
-    SPI_SendData(SPI2,(uint8_t*)user_data, strlen(user_data)); // to send data
+    SPI_SendData(SPI2,(uint8_t*)user_data,strlen(user_data));
 
+//    while(SPI_GetFlagStatus(SPI2,SPI_BUSY_FLAG));//If this RETURN 1,SPI is busy
+    SPI_Peripheralcontrol(SPI2,DISABLE);
     while(1);
     return 0;
 }

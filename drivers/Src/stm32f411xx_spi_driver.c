@@ -63,21 +63,17 @@ void SPI_Init(SPI_Handle_t *pSPIHandle){
 	  //2.Configure Bus Config
 	  if(pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_FD){
 		  //clear bidi mode
-		  tempreg &= ~(1<<15);
+		  tempreg &= ~(1<<SPI_CR1_BIDIMODE);
 	  }
 	  else if(pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_HD){
 		  //set bidi mode
-		  tempreg |= (1<<15);
-	  }
-	  else if(pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_SIMPLEX_TXONLY){
-		  //set bidi mode
-		  tempreg |= (1<<14);
+		  tempreg |= (1<<SPI_CR1_BIDIMODE);
 	  }
 	  else if(pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_SIMPLEX_RXONLY){
 		  //clear bidi mode
-		  tempreg &= ~(1<<15);
+		  tempreg &= ~(1<<SPI_CR1_BIDIMODE);
 		  //set RXONLY bit
-		  tempreg |= (1<<10);
+		  tempreg |= (1<<SPI_CR1_RXONLY);
 	  }
 
 	  //3. configure clk speed
@@ -128,25 +124,33 @@ uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx,uint32_t FlagName){
 // This is Blocking Call
 
 void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len){
-	 while(Len>0){
-		 //wait until tx buffer is set (set 1 denotes empty)
-		 while(SPI_GetFlagStatus(pSPIx,SPI_TXE_FLAG) == FLAG_RESET); //polling for TXE flag to set
+	while (Len>0) {
+	        // Wait until TX buffer is empty
+	        while (SPI_GetFlagStatus(pSPIx, SPI_TXE_FLAG) == FLAG_RESET);
 
-		 //check DFF bit in CR1
-		 if((pSPIx->CR1 & (1<<SPI_CR1_DFF))){
-			 //16bit DFF
-			 pSPIx->DR = *((uint16_t*)pTxBuffer); // buffer is type casting to store 16bit
-			 Len--;
-			 Len--; // two time decrement -> 2bytes
-			 (uint16_t*)pTxBuffer++; //inc pointer
-		 }
-		 else{
-			 //8bit DFF
-			 pSPIx->DR = *pTxBuffer;
-			 Len--; // one time decrement -> 1byte
-			 pTxBuffer++;
-		 }
-	 }
+	        // Check DFF bit in CR1 for 8-bit or 16-bit data mode
+	        if (pSPIx->CR1 & (1 << SPI_CR1_DFF)) {
+	            // 16-bit DFF: Send 2 bytes
+//	            pSPIx->DR =*pString ;
+//	            pString++; // Move to the next character
+	            pSPIx->DR =   *((uint16_t*)pTxBuffer);
+	            Len--;
+	            Len--;
+	            (uint16_t*)pTxBuffer++;
+	        } else {
+	            // 8-bit DFF: Send 1 byte
+//	        	pSPIx->DR =*pString ;
+//	            pString++; // Move to the next character
+				pSPIx->DR =   *pTxBuffer;
+				Len--;
+				pTxBuffer++;
+
+	        }
+	    }
+
+	while (SPI_GetFlagStatus(pSPIx, SPI_BUSY_FLAG) == FLAG_SET);
+
+
 }
 
 void SPI_ReceiveData(SPI_RegDef_t *pSPIx,uint8_t *pRxBuffer, uint32_t Len);
@@ -167,7 +171,7 @@ void SPI_Peripheralcontrol(SPI_RegDef_t *pSPIx, uint8_t EnorDi){
 	if(EnorDi == ENABLE){
 	pSPIx->CR1 |= (1<<SPI_CR1_SPE);
 	}
-	else{
+	else if(EnorDi == DISABLE){
 	pSPIx->CR1 &= ~(1<<SPI_CR1_SPE);
 
 	}
@@ -182,4 +186,15 @@ void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnorDi){
 
 		}
 }
+
+void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnorDi){
+	if(EnorDi == ENABLE){
+		pSPIx->CR2 |= (1<<SPI_CR2_SSOE);
+		}
+	else if(EnorDi == DISABLE){
+		pSPIx->CR2 &= ~(1<<SPI_CR2_SSOE);
+
+		}
+}
+
 

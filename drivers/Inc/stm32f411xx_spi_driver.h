@@ -45,8 +45,7 @@ typedef struct{
  */
 #define SPI_BUS_CONFIG_FD                  1
 #define SPI_BUS_CONFIG_HD                  2
-#define SPI_BUS_CONFIG_SIMPLEX_TXONLY      3
-#define SPI_BUS_CONFIG_SIMPLEX_RXONLY      4
+#define SPI_BUS_CONFIG_SIMPLEX_RXONLY      3
 
 /*
  @SPI_SClkSpeed
@@ -117,8 +116,8 @@ void SPI_DeInit(SPI_RegDef_t *pSPIx);      //parameter point to base address of 
 
 /* Data Send and Receive  */
 
+//void SPI_SendData(SPI_RegDef_t *pSPIx, char *pString,uint32_t Len);
 void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len);
-
 void SPI_ReceiveData(SPI_RegDef_t *pSPIx,uint8_t *pRxBuffer, uint32_t Len);
 
 
@@ -136,5 +135,6 @@ void SPI_IRQHandling(SPI_Handle_t *pHandle);
  */
 void SPI_Peripheralcontrol(SPI_RegDef_t *pSPIx, uint8_t EnorDi); //to enable SPI Peripheral
 void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnorDi);
-
+void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnorDi);
+uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx , uint32_t FlagName);
 #endif /* INC_STM32F411XX_SPI_DRIVER_H_ */
