@@ -9,9 +9,10 @@
 #define INC_STM32F411XX_H_
 
 #include<stdint.h>
+#include<stddef.h>
 
-#define __vo volatile
-
+#define __vo   volatile
+#define __weak __attribute__((weak))
 
 
 /*********** PROCESSOR SPECIFIC DETAILS ****************/
@@ -112,6 +113,21 @@ typedef struct {
 
 }SPI_RegDef_t;
 
+/* PERIPHERAL  REGISTER  DEFINITION STRUCTURES FOR I2C */
+typedef struct{
+	__vo uint32_t CR1;
+	__vo uint32_t CR2;
+	__vo uint32_t OAR1;
+	__vo uint32_t OAR2;
+	__vo uint32_t DR;
+	__vo uint32_t SR1;
+	__vo uint32_t SR2;
+	__vo uint32_t CCR;
+	__vo uint32_t TRISE;
+	__vo uint32_t FLTR;
+}I2C_RegDef_t;
+
+
 typedef struct{
 	__vo uint32_t CR;
 	__vo uint32_t PLLCFGR;
@@ -186,6 +202,17 @@ typedef struct{
 #define IRQ_NO_EXTI21     2
 #define IRQ_NO_EXTI22     3
 
+
+
+ /*INTERRUPT REQUEST NUMBER FOR SPI */
+#define IRQ_NO_SPI1       35
+#define IRQ_NO_SPI2       36
+#define IRQ_NO_SPI3       51
+#define IRQ_NO_SPI4       84
+#define IRQ_NO_SPI5       85
+
+
+
 /* MACROS for all possible priority levels */
 #define NVIC_IRQ_PRI0     0
 #define NVIC_IRQ_PRI1     1
@@ -227,6 +254,9 @@ typedef struct{
 #define SPI4     ((SPI_RegDef_t*)SPI4_BASEADDR)
 #define SPI5     ((SPI_RegDef_t*)SPI5_BASEADDR)
 
+#define I2C1     ((I2C_RegDef_t*)I2C1_BASEADDR)
+#define I2C2     ((I2C_RegDef_t*)I2C2_BASEADDR)
+#define I2C3     ((I2C_RegDef_t*)I2C3_BASEADDR)
 
 /* CLOCK ENABLE MACROS FOR GPIOX PERIPHERALS */
 #define GPIOA_PCLK_EN()  (RCC -> AHB1ENR |= (1<<0)) // |= means setting bit (enable)
@@ -305,6 +335,12 @@ typedef struct{
 #define SPI4_REG_RESET()    do{(RCC -> APB2ENR |= (1<<13)); (RCC -> APB2ENR &= ~(1<<13));}while(0)
 #define SPI5_REG_RESET()    do{(RCC -> APB2ENR |= (1<<20)); (RCC -> APB2ENR &= ~(1<<20));}while(0)
 
+/* Macros to reset I2CX peripherals  */
+#define I2C1_REG_RESET()    do{(RCC -> APB1ENR |= (1<<21)); (RCC -> APB1ENR &= ~(1<<21));}while(0)
+#define I2C2_REG_RESET()    do{(RCC -> APB1ENR |= (1<<22)); (RCC -> APB1ENR &= ~(1<<21));}while(0)
+#define I2C3_REG_RESET()    do{(RCC -> APB1ENR |= (1<<23)); (RCC -> APB1ENR &= ~(1<<21));}while(0)
+
+
 //some generic macros
 
 #define ENABLE               1
@@ -356,8 +392,49 @@ typedef struct{
 
 
 
+/* BIT POSITION DEFINITIONS OF I2C PERPHERAL  */
+/********   I2C_CR1 REGISTER BITS     ***********/
+#define I2C_CR1_PE            0
+#define I2C_CR1_NOSTRETCH     7
+#define I2C_CR1_START         8
+#define I2C_CR1_STOP          9
+#define I2C_CR1_ACK           10
+#define I2C_CR1_SWRST         15
+
+/********   I2C_CR1 REGISTER BITS     ***********/
+#define I2C_CR2_FREQ            0
+#define I2C_CR2_ITERREN         8
+#define I2C_CR2_ITEVTEN         9
+#define I2C_CR2_ITBUFEN         10
+
+/********   I2C_SR1 REGISTER BITS     ***********/
+#define I2C_SR1_SB               0
+#define I2C_SR1_ADDR             1
+#define I2C_SR1_BTF              2
+#define I2C_SR1_ADD10            3
+#define I2C_SR1_STOPF            4
+#define I2C_SR1_RXNE             6
+#define I2C_SR1_TXE              7
+#define I2C_SR1_BERR             8
+#define I2C_SR1_ARLO             9
+#define I2C_SR1_AF               10
+#define I2C_SR1_OVR              11
+#define I2C_SR1_TIMEOUT          14
+
+/********   I2C_SR2 REGISTER BITS     ***********/
+#define I2C_SR2_MSL            0
+#define I2C_SR2_BUSY           1
+#define I2C_SR2_TRA            2
+#define I2C_SR2_GENCALL        4
+#define I2C_SR2_DUALF          7
+
+/********   I2C_CCR REGISTER BITS     ***********/
+#define I2C_CCR_CCR            0
+#define I2C_CCR_DUTY           14
+#define I2C_CCR_FS             15
 
 
+#include"stm32f411xx_i2c_driver.h"
 #include"stm32f411xx_gpio_driver.h"
 #include "stm32f411xx_spi_driver.h"
 

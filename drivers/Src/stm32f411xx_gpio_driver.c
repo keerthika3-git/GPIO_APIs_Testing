@@ -68,15 +68,18 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle){
 //	//Enable Peripheral clock
 //	GPIO_PeriClockControl(pGPIOHandle->pGPIOx, ENABLE);
 
-
 	//1.configure modes
 	 if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <= GPIO_MODE_ANALOG ){
+		 if(pGPIOHandle->pGPIOx == GPIOA){
+		pGPIOHandle->pGPIOx->MODER=0x00000000;}
        //non interrupt mode
        temp=(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <<(2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
        pGPIOHandle->pGPIOx->MODER &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber); //clearing 2bits before setting
        pGPIOHandle->pGPIOx->MODER |=temp; //setting
 	 }
 	 else{
+
+
 		 //this for interrupt mode
 		 if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode == GPIO_MODE_IT_RT){
 			 //1. configure Falling Trigger Selection Register
@@ -109,17 +112,19 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle){
 	 }
 
 	 temp=0;
-
 	 //2.configure speed
+	 if(pGPIOHandle->pGPIOx == GPIOA){
 
+	 pGPIOHandle->pGPIOx->OSPEEDR= 0x00000000;}
 	 temp=(pGPIOHandle->GPIO_PinConfig.GPIO_PinSpeed <<(2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
-	 pGPIOHandle->pGPIOx->OSPEEDR &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);//clearing 2bits before setting and 0x3 means to enable first 2bits - 0011(3)
+	 pGPIOHandle->pGPIOx->OSPEEDR &= ~(0x3 << 2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);//clearing 2bits before setting and 0x3 means to enable first 2bits - 0011(3)
 	 pGPIOHandle->pGPIOx->OSPEEDR |=temp; //setting
 
 	 temp=0;
 
 	 //3.configure output types
-
+	 if(pGPIOHandle->pGPIOx == GPIOA){
+	 pGPIOHandle->pGPIOx->OTYPER=0x00000000;}
 	 temp=(pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType <<(pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
 	 pGPIOHandle->pGPIOx->OTYPER &= ~(0x1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);//clearing 1bit before setting
 	 pGPIOHandle->pGPIOx->OTYPER |=temp; //setting
@@ -127,9 +132,10 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle){
 	 temp=0;
 
 	 //4. configure pull up/pull down
-
+	 if(pGPIOHandle->pGPIOx == GPIOA){
+	 pGPIOHandle->pGPIOx->PUPDR=0x00000000;}
 	 temp=(pGPIOHandle->GPIO_PinConfig.GPIO_PinPuPdControl <<(2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
-	 pGPIOHandle->pGPIOx->PUPDR &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);//clearing 2bits before setting and 0x3 means to enable first 2bits - 0011(3)
+	 pGPIOHandle->pGPIOx->PUPDR &= ~(0x3 << 2 *pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);//clearing 2bits before setting and 0x3 means to enable first 2bits - 0011(3)
      pGPIOHandle->pGPIOx->PUPDR |=temp;
 
 	 temp=0;
@@ -198,39 +204,29 @@ void GPIO_ToggleOutputPin(GPIO_RegDef_t *pGPIOx,uint8_t PinNumber){
 }
 
 
-/* TRQ Configuration and ISR Handling */
+/* IRQ Configuration and ISR Handling */
 
 void GPIO_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDis){
-	if(EnorDis == ENABLE){
-		if(IRQNumber <= 31){
-			//program Interrupt Set Enable Register0 register
-			*NVIC_ISER0 |= (1<<IRQNumber); //holds 32bits
+	if (EnorDis == ENABLE) {
+	        // Enable interrupt
+	        if (IRQNumber <= 31) {
+	            *NVIC_ISER0 |= (1 << IRQNumber); // Enable interrupt in ISER0
+	        } else if (IRQNumber >= 32 && IRQNumber < 64) {
+	            *NVIC_ISER1 |= (1 << (IRQNumber % 32)); // Enable interrupt in ISER1
 
-		}else if (IRQNumber > 31 && IRQNumber < 64 ){
-			//program ISER1 register
-			*NVIC_ISER1 |= (1<<IRQNumber % 32);
-
-		}else if(IRQNumber >=64 && IRQNumber < 96){
-			//program ISER2 register
-			*NVIC_ISER2 |= (1<<IRQNumber % 64);
-
-		}
-	}else{
-		if(IRQNumber <= 31){
-			//program Interrupt Clear Enable Register0 register
-			*NVIC_ICER0 |= (1<<IRQNumber);// holds 32 bits
-
-		}else if (IRQNumber > 31 && IRQNumber < 64 ){
-			//program ICER1 register
-			*NVIC_ICER1 |= (1<<IRQNumber % 32);
-
-		}else if(IRQNumber >=64 && IRQNumber < 96){
-			//program ICER2 register
-			*NVIC_ICER2 |= (1<<IRQNumber % 64);
-
-		}
-
-	}
+	        } else if (IRQNumber >=64 && IRQNumber <96) {
+	            *NVIC_ISER2 |= (1 << (IRQNumber % 64)); // Enable interrupt in ISER2
+	        }
+	    } else if (EnorDis == DISABLE) {
+	       //  Disable interrupt
+	        if (IRQNumber <= 31) {
+	            *NVIC_ICER0 |= (1 << IRQNumber); // Disable interrupt in ICER0
+	        } else if (IRQNumber >= 32 && IRQNumber < 64) {
+	            *NVIC_ICER1 |= (1 << (IRQNumber % 32)); // Disable interrupt in ICER1
+	        } else if (IRQNumber > 64 && IRQNumber < 96) {
+	            *NVIC_ICER2 |= (1 << (IRQNumber % 64)); // Disable interrupt in ICER2
+	        }
+	    }
 }
 
 void GPIO_IRQPriority(uint8_t IRQNumber,uint32_t IRQPriority){

@@ -1,0 +1,5 @@
+../Src/010.i2c_master_rx_testing.c:24:6:delay	2
+../Src/010.i2c_master_rx_testing.c:34:6:I2C1_PinsInit	1
+../Src/010.i2c_master_rx_testing.c:62:6:I2C1_Inits	1
+../Src/010.i2c_master_rx_testing.c:74:6:GPIO_ButtonInit	1
+../Src/010.i2c_master_rx_testing.c:97:5:main	2

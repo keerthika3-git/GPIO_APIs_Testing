@@ -1,5 +1,0 @@
-../Src/006.SPI_Txonly_arduino.c:28:6:delay	2
-../Src/006.SPI_Txonly_arduino.c:32:6:SPI2_PinsInit	1
-../Src/006.SPI_Txonly_arduino.c:74:6:SPI2_Init	1
-../Src/006.SPI_Txonly_arduino.c:90:6:GPIO_ButtonInit	1
-../Src/006.SPI_Txonly_arduino.c:112:5:main	2
