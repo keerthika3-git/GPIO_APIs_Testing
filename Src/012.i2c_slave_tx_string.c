@@ -1,7 +1,7 @@
 /*
- * 010.i2c_master_rx_testing.c
+ * 012.i2c_slave_tx_string.c
  *
- *  Created on: Nov 28, 2024
+ *  Created on: Nov 29, 2024
  *      Author: keerthika.m
  */
 
@@ -14,10 +14,10 @@
 #include "string.h"
 #include<stdio.h>
 
-extern void initialise_monitor_handles(void);
 
-#define MY_ADDR   0x61
+
 #define SlaveAddr 0x68
+#define MY_ADDR   SlaveAddr
 
 #define LOW 0
 #define BTN_PRESSED LOW
@@ -29,7 +29,7 @@ void delay(void){
 I2C_Handle_t I2C1Handle;
 
 //receive buffer
-uint8_t rcv_buf[32];
+uint8_t Tx_buf[32] = "HELLO, I AM STM32 SLAVE..";
 
 
 void I2C1_PinsInit(void){
@@ -96,11 +96,8 @@ void GPIO_ButtonInit(void){
 }
 
 int main(void){
-	initialise_monitor_handles();
 
-	printf("Application is running\n");
-	uint8_t commandcode;
-	uint8_t len;
+
 
 	GPIO_ButtonInit();
 
@@ -110,36 +107,58 @@ int main(void){
 	//i2c peripheral config
 	I2C1_Inits();
 
+	//I2C IRQ config
+	I2C_IRQInterruptConfig(IRQ_NO_I2C1_EV,ENABLE);
+	I2C_IRQInterruptConfig(IRQ_NO_I2C1_ER,ENABLE);
+
+	I2C_SlaveEnableDisableCallbackEvents(I2C1,ENABLE);
+
 	//enable clock for i2c peripheral
 	I2C_Peripheralcontrol(I2C1,ENABLE);
 
 	//ACK bit is made 1 after PE=1
 	I2C_ManageAcking(I2C1,I2C_ACK_ENABLE);
 
-	while(1){
 
-	//wait till button is pressed
-	while(! GPIO_ReadFromInputPin(GPIOC, GPIO_PIN_NO_13)== BTN_PRESSED);
-
-	delay();//avoid button de-bouncing issues 200ms of delay
-
-	commandcode = 0x51;
-    I2C_MasterSendData(&I2C1Handle, &commandcode,1, SlaveAddr,I2C_ENABLE_SR);
-
-    I2C_MasterReceiveData(&I2C1Handle,&len, 1, SlaveAddr,I2C_ENABLE_SR);
-
-    commandcode = 0x52;
-    I2C_MasterSendData(&I2C1Handle, &commandcode,1, SlaveAddr,I2C_ENABLE_SR);
-
-    I2C_MasterReceiveData(&I2C1Handle,rcv_buf, len, SlaveAddr,I2C_DISABLE_SR);
-
-    rcv_buf[len+1]='\0';
-
-	printf("Data: %s",rcv_buf);
-	}
-
-
-	return 0;
+	while(1);
 }
 
+
+void I2C1_EV_IRQHandler(void){
+	I2C_EV_IRQHandling(&I2C1Handle);
+
+}
+void I2C1_ER_IRQHandler(void){
+	I2C_ER_IRQHandling(&I2C1Handle);
+}
+
+void I2C_ApplicationEventCallback(I2C_Handle_t *pHandle,uint8_t AppEvent){
+	static uint8_t commandcode=0;
+	static uint8_t Cnt=0;
+	if(AppEvent == I2C_EV_DATA_REQ){
+    	//master wants data,slave has to send it
+    	if(commandcode == 0x51){
+    		//send length information to master
+    		I2C_SlaveSendData(pHandle->pI2Cx, strlen((char*)Tx_buf));
+    	}else if(commandcode == 0x52){
+    		//send data
+    		I2C_SlaveSendData(pHandle->pI2Cx, Tx_buf[Cnt++]);
+
+    	}
+    }
+    else if(AppEvent == I2C_EV_DATA_RCV){
+    	//data is waiting for slave to read, slave has to read it
+    	commandcode = I2C_SlaveReceiveData(pHandle->pI2Cx);
+
+    }else if(AppEvent == I2C_ERROR_AF){
+    	//ack failure, happens only in slave transmission
+    	//master sent NACK so slave should stop sending data to master
+    	commandcode =0xff;
+    	Cnt=0;
+
+    }else if(AppEvent == I2C_EV_STOP){
+    	//happens only during slave reception
+    }
+
+}
 

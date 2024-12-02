@@ -1,9 +1,10 @@
 /*
- * 010.i2c_master_rx_testing.c
+ * 011.I2C_master_rx_testingIT.c
  *
- *  Created on: Nov 28, 2024
+ *  Created on: Nov 29, 2024
  *      Author: keerthika.m
  */
+
 
 
 /*
@@ -13,6 +14,8 @@
 #include "stm32f411xx.h"
 #include "string.h"
 #include<stdio.h>
+
+uint8_t rxcmplt=RESET;
 
 extern void initialise_monitor_handles(void);
 
@@ -110,6 +113,11 @@ int main(void){
 	//i2c peripheral config
 	I2C1_Inits();
 
+	//I2C IRQ config
+	I2C_IRQInterruptConfig(IRQ_NO_I2C1_EV,ENABLE);
+	I2C_IRQInterruptConfig(IRQ_NO_I2C1_ER,ENABLE);
+
+
 	//enable clock for i2c peripheral
 	I2C_Peripheralcontrol(I2C1,ENABLE);
 
@@ -124,22 +132,59 @@ int main(void){
 	delay();//avoid button de-bouncing issues 200ms of delay
 
 	commandcode = 0x51;
-    I2C_MasterSendData(&I2C1Handle, &commandcode,1, SlaveAddr,I2C_ENABLE_SR);
+    while( I2C_MasterSendDataIT(&I2C1Handle, &commandcode,1, SlaveAddr,I2C_ENABLE_SR) != I2C_READY);
 
-    I2C_MasterReceiveData(&I2C1Handle,&len, 1, SlaveAddr,I2C_ENABLE_SR);
+    while(I2C_MasterReceiveDataIT(&I2C1Handle,&len, 1, SlaveAddr,I2C_ENABLE_SR)!= I2C_READY);
 
     commandcode = 0x52;
-    I2C_MasterSendData(&I2C1Handle, &commandcode,1, SlaveAddr,I2C_ENABLE_SR);
+    while( I2C_MasterSendDataIT(&I2C1Handle, &commandcode,1, SlaveAddr,I2C_ENABLE_SR) != I2C_READY);
 
-    I2C_MasterReceiveData(&I2C1Handle,rcv_buf, len, SlaveAddr,I2C_DISABLE_SR);
+    while(I2C_MasterReceiveDataIT(&I2C1Handle,rcv_buf, len, SlaveAddr,I2C_DISABLE_SR)!= I2C_READY){}
+
+	rxcmplt = RESET;
+
+    //wait till Rx completes
+    while(rxcmplt != SET){}
 
     rcv_buf[len+1]='\0';
 
 	printf("Data: %s",rcv_buf);
+
+	rxcmplt = RESET;
 	}
 
 
 	return 0;
 }
 
+
+void I2C1_EV_IRQHandler(void){
+	I2C_EV_IRQHandling(&I2C1Handle);
+
+}
+void I2C1_ER_IRQHandler(void){
+	I2C_ER_IRQHandling(&I2C1Handle);
+}
+
+void I2C_ApplicationEventCallback(I2C_Handle_t *pHandle,uint8_t AppEvent){
+	if(AppEvent == I2C_EV_TX_CMPLT){
+		printf("Tx is completed\n");
+	}
+	else if(AppEvent == I2C_EV_RX_CMPLT){
+		printf("Rx is completed\n");
+
+		rxcmplt =SET;
+	}
+	else if(AppEvent == I2C_ERROR_AF){
+		printf("ERROR: ACK failure\n");
+		//in master ack failure happens when slave fails to send ack for the byte
+	    I2C_CloseSendData(pHandle);
+
+	    //generate stop condition to release the bus
+	    I2C_GenerateStopCondition(I2C1);
+
+	    //Hang in infinite loop
+	    while(1);
+	}
+}
 

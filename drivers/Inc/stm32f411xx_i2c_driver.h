@@ -25,6 +25,14 @@ typedef struct{
 typedef struct{
 	I2C_RegDef_t *pI2Cx;       // pointer to hold base address of I2Cx
 	I2C_Config_t  I2C_Config;   // holds I2C pin configuration
+    uint8_t      *pTxBuffer;   // to store tx buffer address
+    uint8_t      *pRxBuffer;   // to store Rx buffer address
+    uint32_t      TxLen;       // to store TX Len
+    uint32_t      RxLen;       // to store RX Len
+    uint8_t       TxRxState;   // to store communication state
+    uint8_t       DevAddr;     // to store slave address
+    uint32_t      RxSize;      // to store Rx size
+    uint8_t       Sr;          // to store repeated start value
  }I2C_Handle_t;
 
 
@@ -66,6 +74,32 @@ typedef struct{
 #define I2C_FLAG_SB      (1<<I2C_SR1_SB)
 
 
+#define I2C_DISABLE_SR   RESET
+#define I2C_ENABLE_SR      SET
+
+
+ /*
+  * I2C application events macros
+  */
+#define I2C_EV_TX_CMPLT     0
+#define I2C_EV_RX_CMPLT     1
+#define I2C_EV_STOP         2
+#define I2C_ERROR_BERR      3
+#define I2C_ERROR_ARLO      4
+#define I2C_ERROR_AF        5
+#define I2C_ERROR_OVR       6
+#define I2C_ERROR_TIMEOUT   7
+#define I2C_EV_DATA_REQ     8
+#define I2C_EV_DATA_RCV     9
+
+ /*
+  * I2C application states
+  */
+#define I2C_READY          0
+#define I2C_BUSY_IN_RX     1
+#define I2C_BUSY_IN_TX     2
+
+
  /* APIs SUPPORTED BY THIS DRIVER  */
 
  /* Peripheral Clock setup*/
@@ -83,8 +117,17 @@ typedef struct{
 
 
  /* Data Send and Receive  */
-void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer,uint32_t Len,uint8_t SlaveAddr);
-void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer,uint32_t Len,uint8_t SlaveAddr);
+void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer,uint32_t Len,uint8_t SlaveAddr,uint8_t Sr);
+void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer,uint32_t Len,uint8_t SlaveAddr,uint8_t Sr);
+
+uint8_t I2C_MasterSendDataIT(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer,uint32_t Len,uint8_t SlaveAddr,uint8_t Sr);
+uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer,uint32_t Len,uint8_t SlaveAddr,uint8_t Sr);
+
+void I2C_CloseReceiveData(I2C_Handle_t *pI2CHandle);
+void I2C_CloseSendData(I2C_Handle_t *pI2CHandle);
+
+void I2C_SlaveSendData(I2C_RegDef_t *pI2Cx,uint8_t data);
+uint8_t I2C_SlaveReceiveData(I2C_RegDef_t *pI2Cx);
 
 
 
@@ -94,11 +137,17 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer,uint32_t
 
  void I2C_IRQPriority(uint8_t IRQNumber,uint32_t IRQPriority);//priority
 
+ void I2C_EV_IRQHandling(I2C_Handle_t *pI2CHandle);
+
+ void I2C_ER_IRQHandling(I2C_Handle_t *pI2CHandle);
 
 
  /*
   * Peripheral Control APIs
   */
+void I2C_SlaveEnableDisableCallbackEvents(I2C_RegDef_t *pI2Cx,uint8_t EnorDi);
+
+void I2C_GenerateStopCondition(I2C_RegDef_t *pI2Cx);
 void I2C_Peripheralcontrol(I2C_RegDef_t *pI2Cx, uint8_t EnorDi); //to enable I2C Peripheral
 
 uint8_t I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx , uint32_t FlagName);
