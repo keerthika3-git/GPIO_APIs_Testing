@@ -127,6 +127,18 @@ typedef struct{
 	__vo uint32_t FLTR;
 }I2C_RegDef_t;
 
+/* PERIPHERAL  REGISTER  DEFINITION STRUCTURES FOR USART */
+typedef struct{
+	__vo uint32_t SR;
+	__vo uint32_t DR;
+	__vo uint32_t BRR;
+	__vo uint32_t CR1;
+	__vo uint32_t CR2;
+	__vo uint32_t CR3;
+	__vo uint32_t GTPR;
+}USART_RegDef_t;
+
+
 
 typedef struct{
 	__vo uint32_t CR;
@@ -210,7 +222,10 @@ typedef struct{
 #define IRQ_NO_I2C3_EV    72
 #define IRQ_NO_I2C3_ER    73
 
-
+/*INTERRUPT REQUEST NUMBER FOR USART */
+#define IRQ_NO_USART1     37
+#define IRQ_NO_USART2     38
+#define IRQ_NO_USART6     71
 
  /*INTERRUPT REQUEST NUMBER FOR SPI */
 #define IRQ_NO_SPI1       35
@@ -265,6 +280,10 @@ typedef struct{
 #define I2C1     ((I2C_RegDef_t*)I2C1_BASEADDR)
 #define I2C2     ((I2C_RegDef_t*)I2C2_BASEADDR)
 #define I2C3     ((I2C_RegDef_t*)I2C3_BASEADDR)
+
+#define USART1   ((USART_RegDef_t*)USART1_BASEADDR)
+#define USART2   ((USART_RegDef_t*)USART2_BASEADDR)
+#define USART6   ((USART_RegDef_t*)USART6_BASEADDR)
 
 /* CLOCK ENABLE MACROS FOR GPIOX PERIPHERALS */
 #define GPIOA_PCLK_EN()  (RCC -> AHB1ENR |= (1<<0)) // |= means setting bit (enable)
@@ -347,6 +366,12 @@ typedef struct{
 #define I2C1_REG_RESET()    do{(RCC -> APB1ENR |= (1<<21)); (RCC -> APB1ENR &= ~(1<<21));}while(0)
 #define I2C2_REG_RESET()    do{(RCC -> APB1ENR |= (1<<22)); (RCC -> APB1ENR &= ~(1<<21));}while(0)
 #define I2C3_REG_RESET()    do{(RCC -> APB1ENR |= (1<<23)); (RCC -> APB1ENR &= ~(1<<21));}while(0)
+
+/* Macros to reset I2CX peripherals  */
+#define USART1_REG_RESET()    do{(RCC -> APB2ENR |= (1<<4)); (RCC -> APB2ENR &= ~(1<<4));}while(0)
+#define USART2_REG_RESET()    do{(RCC -> APB1ENR |= (1<<17)); (RCC -> APB1ENR &= ~(1<<17));}while(0)
+#define USART6_REG_RESET()    do{(RCC -> APB2ENR |= (1<<5)); (RCC -> APB2ENR &= ~(1<<5));}while(0)
+
 
 
 //some generic macros
@@ -441,7 +466,63 @@ typedef struct{
 #define I2C_CCR_DUTY           14
 #define I2C_CCR_FS             15
 
+/* BIT POSITION DEFINITIONS OF USART PERPHERAL  */
+/********   USART_CR1 REGISTER BITS     ***********/
+#define USART_CR1_SBK         0
+#define USART_CR1_RWU         1
+#define USART_CR1_RE          2
+#define USART_CR1_TE          3
+#define USART_CR1_IDLEIE      4
+#define USART_CR1_RXNEIE      5
+#define USART_CR1_TCIE        6
+#define USART_CR1_TXEIE       7
+#define USART_CR1_PEIE        8
+#define USART_CR1_PS          9
+#define USART_CR1_PCE         10
+#define USART_CR1_WAKE        11
+#define USART_CR1_M           12
+#define USART_CR1_UE          13
+#define USART_CR1_OVER8       15
 
+/********   USART_CR2 REGISTER BITS     ***********/
+#define USART_CR2_ADD         0
+#define USART_CR2_LBDL        5
+#define USART_CR2_LBDIE       6
+#define USART_CR2_LBCL        8
+#define USART_CR2_CPHA        9
+#define USART_CR2_CPOL        10
+#define USART_CR2_CLKEN       11
+#define USART_CR2_STOP        12
+#define USART_CR2_LINEN       14
+
+/********   USART_CR3 REGISTER BITS     ***********/
+#define USART_CR3_EIE         0
+#define USART_CR3_IREN        1
+#define USART_CR3_IRLP        2
+#define USART_CR3_HDSEL       3
+#define USART_CR3_NACK        4
+#define USART_CR3_SCEN        5
+#define USART_CR3_DMAR        6
+#define USART_CR3_DMAT        7
+#define USART_CR3_RTSE        8
+#define USART_CR3_CTSE        9
+#define USART_CR3_CTSIE       10
+#define USART_CR3_ONEBIT      11
+
+/********   USART_SR REGISTER BITS     ***********/
+#define USART_SR_PE         0
+#define USART_SR_FE         1
+#define USART_SR_NF         2
+#define USART_SR_ORE        3
+#define USART_SR_IDLE       4
+#define USART_SR_RXNE       5
+#define USART_SR_TC         6
+#define USART_SR_TXE        7
+#define USART_SR_LBD        8
+#define USART_SR_CTS        9
+
+#include "stm32f411xx_rcc_driver.h"
+#include"stm32f411xx_uart_driver.h"
 #include"stm32f411xx_i2c_driver.h"
 #include"stm32f411xx_gpio_driver.h"
 #include "stm32f411xx_spi_driver.h"

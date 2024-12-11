@@ -73,12 +73,12 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.836853494" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.231144554.1994336114" name="011.I2C_master_rx_testingIT.c" rcbsApplicability="disable" resourcePath="Src/011.I2C_master_rx_testingIT.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1700664753.1870661122">
-						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1700664753.1870661122" name="MCU/MPU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1700664753"/>
+					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.231144554.1081432590" name="015uart_case.c" rcbsApplicability="disable" resourcePath="Src/015uart_case.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1700664753.647353741">
+						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1700664753.647353741" name="MCU/MPU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1700664753"/>
 					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Inc"/>
-						<entry excluding="011.I2C_master_rx_testingIT.c|010.i2c_master_rx_testing.c|009.i2c_master_tx_testing.c|008spi_message_rcv_it.c|syscalls.c|009spi_message_rcv_it.c|007.SPI_CMD_Handling.c|005.Spi_tx_testing.c|006.SPI_Txonly_arduino.c|004.button_interrupt.c|003.Led_Button_External.c|002Led_Button.c|001Toggle_Led.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
+						<entry excluding="014uart_tx.c|012.i2c_slave_tx_string.c|011.I2C_master_rx_testingIT.c|010.i2c_master_rx_testing.c|009.i2c_master_tx_testing.c|008spi_message_rcv_it.c|syscalls.c|009spi_message_rcv_it.c|007.SPI_CMD_Handling.c|005.Spi_tx_testing.c|006.SPI_Txonly_arduino.c|004.button_interrupt.c|003.Led_Button_External.c|002Led_Button.c|001Toggle_Led.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Startup"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="drivers"/>
 					</sourceEntries>

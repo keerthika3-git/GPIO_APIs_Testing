@@ -8,8 +8,6 @@
 
 #include "stm32f411xx_i2c_driver.h"
 
-uint16_t AHB_PresScaler[8] = {2,4,8,16,64,128,256,512};
-uint16_t APB1_PresScaler[4] = {2,4,8,16};
 
 static void I2C_GenerateStartCondition(I2C_RegDef_t *pI2Cx);
 static void I2C_ExecuteAddressPhaseWrite(I2C_RegDef_t *pI2Cx, uint8_t SlaveAddr);
@@ -127,46 +125,7 @@ void I2C_PeriClockControl(I2C_RegDef_t *pI2Cx,uint8_t EnorDi){
 
 	}
 }
-uint32_t RCC_GetPLLOutputClock(){
-	return 0;
-}
 
-uint32_t RCC_GetPCLK1Value(void){
-	uint32_t pclk1,SystemClk;
-
-	uint8_t clksrc,temp,ahbp,apb1;
-
-	clksrc = ((RCC->CFGR >> 2) &0x3); //mask all bits in cfgr register except 2 and 3 bits
-	if(clksrc==0){
-		SystemClk = 16000000;
-	}
-	else if(clksrc==1){
-		SystemClk = 8000000;
-	}
-	else if(clksrc==2){
-		SystemClk = RCC_GetPLLOutputClock();
-	}
-
-	//AHB
-	temp=((RCC->CFGR >> 4) &0xF);
-	if(temp<8){
-		ahbp=1;
-	}else{
-		ahbp=AHB_PresScaler[temp-8];
-	}
-
-	//APB1
-	temp=((RCC->CFGR >> 10) &0x7);
-	if(temp<4){
-		apb1=1;
-	}else{
-		apb1=APB1_PresScaler[temp-4];
-	}
-
-	pclk1 = (SystemClk / ahbp ) / apb1;
-
-	return pclk1;
-}
 
 /* Init and DeInit  */
 

@@ -70,8 +70,7 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle){
 
 	//1.configure modes
 	 if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <= GPIO_MODE_ANALOG ){
-		 if(pGPIOHandle->pGPIOx == GPIOA){
-		pGPIOHandle->pGPIOx->MODER=0x00000000;}
+
        //non interrupt mode
        temp=(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <<(2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
        pGPIOHandle->pGPIOx->MODER &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber); //clearing 2bits before setting
@@ -113,9 +112,9 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle){
 
 	 temp=0;
 	 //2.configure speed
-	 if(pGPIOHandle->pGPIOx == GPIOA){
-
-	 pGPIOHandle->pGPIOx->OSPEEDR= 0x00000000;}
+//	 if(pGPIOHandle->pGPIOx == GPIOA){
+//
+//	 pGPIOHandle->pGPIOx->OSPEEDR= 0x00000000;}
 	 temp=(pGPIOHandle->GPIO_PinConfig.GPIO_PinSpeed <<(2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
 	 pGPIOHandle->pGPIOx->OSPEEDR &= ~(0x3 << 2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);//clearing 2bits before setting and 0x3 means to enable first 2bits - 0011(3)
 	 pGPIOHandle->pGPIOx->OSPEEDR |=temp; //setting
@@ -123,8 +122,8 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle){
 	 temp=0;
 
 	 //3.configure output types
-	 if(pGPIOHandle->pGPIOx == GPIOA){
-	 pGPIOHandle->pGPIOx->OTYPER=0x00000000;}
+//	 if(pGPIOHandle->pGPIOx == GPIOA){
+//	 pGPIOHandle->pGPIOx->OTYPER=0x00000000;}
 	 temp=(pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType <<(pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
 	 pGPIOHandle->pGPIOx->OTYPER &= ~(0x1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);//clearing 1bit before setting
 	 pGPIOHandle->pGPIOx->OTYPER |=temp; //setting
@@ -132,8 +131,8 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle){
 	 temp=0;
 
 	 //4. configure pull up/pull down
-	 if(pGPIOHandle->pGPIOx == GPIOA){
-	 pGPIOHandle->pGPIOx->PUPDR=0x00000000;}
+//	 if(pGPIOHandle->pGPIOx == GPIOA){
+//	 pGPIOHandle->pGPIOx->PUPDR=0x00000000;}
 	 temp=(pGPIOHandle->GPIO_PinConfig.GPIO_PinPuPdControl <<(2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
 	 pGPIOHandle->pGPIOx->PUPDR &= ~(0x3 << 2 *pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);//clearing 2bits before setting and 0x3 means to enable first 2bits - 0011(3)
      pGPIOHandle->pGPIOx->PUPDR |=temp;
